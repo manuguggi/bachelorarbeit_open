@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Analyse Dashboard - mybuxi</title>
+    <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='assets/mybuxi_Logo.png') }}" sizes="32x32"/>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script> <!-- jQuery -->
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script> <!-- jQuery UI -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.min.css') }}?r={{randomno}}"> <!-- Custom JQuery UI CSS -->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/datepicker-de.js') }}?r={{randomno}}"></script> <!-- DE-Sprache für Datepicker -->
+    
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script> <!-- Font Awesome Icons -->
+
+    <script src="https://d3js.org/d3.v7.min.js"></script> <!-- D3 -->
+    <script src="https://cdn.plot.ly/plotly-2.18.2.min.js"></script> <!-- Plotly -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script> <!-- Lodash -->
+
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.js'></script> <!--MapBox GL JS-->
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.css' rel='stylesheet' /> <!--MapBox GL CSS-->
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous" defer></script> <!-- Bootstrap JS -->  
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous"> <!-- Bootstrap CSS -->    
+
+    <link href="{{ url_for('static', filename='css/menu.css') }}?r={{randomno}}" rel="stylesheet" /> <!-- Eigenes Menu-Stylesheet -->
+    <link href="{{ url_for('static', filename='css/home.css') }}?r={{randomno}}" rel="stylesheet" /> <!-- Eigenes Stylesheet Home-Tab -->
+    <link href="{{ url_for('static', filename='css/routen.css') }}?r={{randomno}}" rel="stylesheet" /> <!-- Eigenes Stylesheet Routen-Tab -->
+    
+    <script type='module' src="{{ url_for('static', filename='js/init.js') }}?r={{randomno}}" defer></script> <!-- Eigene JS Dateien -->
+
+</head>
+
+
+
+<body>
+
+  <!-- Topbar -->
+  <header id="topbar" class="text-bg-dark d-flex align-items-center">
+    
+    <!-- mybuxi-Logo -->
+    <a href="http://127.0.0.1:5000/" id="mybuxi-logo" class="d-flex justify-content-center flex-shrink-0">
+      <img src="{{ url_for('static', filename='assets/mybuxi_Logo.png') }}?r={{randomno}}" alt="mybuxi-Icon" width="50" >
+    </a>
+
+    <!-- Seitentitel -->
+    <span id="topbar-pagename" class="ms-2 me-2">Home</span>
+
+    <!-- Filter -->
+    <div id="topbar-filters" class="d-flex ms-auto align-items-center"> 
+      <!-- Regionenwahl -->
+      <div id="region_sel" class="dropdown ms-2 me-1">
+        <button class="btn btn-sm btn-outline-secondary text-bg-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+        Alle Regionen
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+          <li class="d-flex gap-1">
+            <input id="belp-cb" class="form-check-input ms-2" type="checkbox" value="Belp" checked>
+            <label for="belp-cb" class="me-2 flex-grow-1"><span>Belp</span></label>
+          </li>
+          <li class="d-flex gap-1">
+            <input id="emmental-cb" class="form-check-input ms-2" type="checkbox" value="Emmental" checked>
+            <label for="emmental-cb" class="me-2 flex-grow-1"><span>Emmental</span></label>
+          </li>
+          <li class="d-flex gap-1">
+            <input id="gotthard-cb" class="form-check-input ms-2" type="checkbox" value="Gotthard" checked>
+            <label for="gotthard-cb" class="me-2 flex-grow-1"><span>Gotthard</span></label>
+          </li>
+          <li class="d-flex gap-1">
+            <input id="herzogenbuchsee-cb" class="form-check-input ms-2" type="checkbox" value="Herzogenbuchsee" checked>
+            <label for="herzogenbuchsee-cb" class="me-2 flex-grow-1"><span>Herzogenbuchsee</span></label>
+          </li>
+        </ul>
+      </div> 
+      <!-- Datumswahl -->
+      <div id="date-sel" class="input-group input-group-sm flex-nowrap ms-2" data-bs-theme="dark">
+        <span class="input-group-text">Von</span>
+        <input type="text" class="form-control text-bg-dark" id="from_date" name="from" autocomplete="off">
+        <span class="input-group-text">bis</span>
+        <input type="text" class="form-control text-bg-dark" id="to_date" name="to" autocomplete="off">
+      </div>
+      <!-- Zeit-Slider -->
+      <div id="time-range" class="ms-5">
+        <span class="slider-time">6:00</span>
+        <span class="slider-time2">23:59</span>
+        <div class="sliders_step1">
+          <div id="slider-range"></div>
+        </div>
+      </div>
+    </div>  
+      
+  </header>
+
+  
+  <div id="myTabs">
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="bg-light">
+      <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
+        <li class="nav-item">
+          <a class="nav-link py-3 border-bottom rounded-0 active" href="#home" title="Home" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fas fa-house fa-lg"></i>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link py-3 border-bottom rounded-0" href="#routen" title="Routen" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fas fa-map-signs fa-lg"></i>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link py-3 border-bottom rounded-0" href="#pooling" title="Pooling & Auslastung" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fas fa-users fa-lg"></i>
+          </a>
+        </li>
+        <li>
+          <a class="nav-link py-3 border-bottom rounded-0" href="#prognose" title="Prognose" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="fas fa-chart-line fa-lg"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  
+
+<!-- Contents -->
+
+  <!-- Home -->
+    <div class="tab-content active" id="home">
+
+      <h4>Übersicht Daten</h4>
+      <table id="dataOV_table" class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">Region</th>
+            <th scope="col">Status</th>
+            <th scope="col">Erster Datensatz</th>
+            <th scope="col">Letzter Datensatz</th>
+            <th scope="col">Lücken</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td scope="row">Belp</td>
+            <td></td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+          <tr>
+            <td scope="row">Emmental</td>
+            <td></td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+          <tr>
+            <td scope="row">Gotthard</td>
+            <td></td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+          <tr>
+            <td scope="row">Herzogenbuchsee</td>
+            <td></td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4 class="mt-5">Datenupload</h4>
+      <div class="col-lg-8 col-md-10 col-sm-12">
+        <form id="upload_form">
+
+          <div class="row g-3">
+            <div class="col-12">
+              <label for="choose_file" class="form-label fw-bold">CSV-Datei</label>
+              <input class="form-control" type="file" id="choose_file" name="file" required>
+            </div>
+          </div>
+      
+          <div class="mt-4 col-12">
+            <label class="form-label fw-bold">Datei-Informationen</label>
+            <table id='file_info' class="table table-sm table-striped table-borderless col-6">
+              <tbody>
+                <tr>
+                  <td scope="row">Erkannte Region:</td>
+                  <td>-</td>
+                </tr>
+                <tr>
+                  <td scope="row">Erstes verfügbares Datum:</td>
+                  <td>-</td>
+                </tr>
+                <tr>
+                  <td scope="row">Letztes verfügbares Datum:</td>
+                  <td>-</td>
+                </tr>
+                <tr>
+                  <td scope="row">Überschreibungen vorhandener Daten:</td>
+                  <td>-</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-12">
+            <button id="submit_button" class="btn btn-primary col-12" type="submit" disabled>Hochladen</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+
+  <!-- Routen -->
+    <div class="tab-content" id="routen">
+      <div class="d-flex flex-row h-100">
+
+        <div id="routen_map" class=""></div>
+
+        <div id="routen_col2" class="d-flex ms-3 flex-column flex-grow-1">
+          <div id="routen_barchart" class="flex-grow-1"></div>
+          <div id="routen_sa_chart" class="flex-grow-1 mt-1"></div>
+        </div>
+
+      </div>
+    </div>
+    
+
+  <!-- Pooling -->
+    <div class="tab-content" id="pooling">
+      <h2>Pooling & Auslastung Content</h2>
+      <p>This is the content for the Pooling & Auslastung tab.</p>
+    </div>
+    
+
+  <!-- Prognose -->
+    <div class="tab-content" id="prognose">
+      <h2>Prognose Content</h2>
+      <p>This is the content for the Prognose tab.</p>
+    </div>
+  </div>
+
+</body>
+
+</html>

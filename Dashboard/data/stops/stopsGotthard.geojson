@@ -1,0 +1,1 @@
+{"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"Address": "Haltestelle 1", "Status": "active"}, "geometry": {"type": "Point", "coordinates": [7.65432, 34.56789]}}]}

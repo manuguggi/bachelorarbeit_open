@@ -1,0 +1,42 @@
+/* Initialisierung */
+#routen.tab-content {
+    width: calc(100% - 70px);
+    height: calc(100vh - 57px);
+    min-height: 450px;
+  }
+#routen_map {
+    width: 45%;
+    min-width: 600px;
+}
+#routen_col2{
+    max-width: calc(100% - 45%); /* 45% = Breite der Map */
+    min-width: 350px;
+}
+#routen_barchart, #routen_sa_chart {
+    max-height: 50%;
+}
+
+/* Map */
+.mapboxgl-popup-content {
+    padding-top: 15px;
+    padding-bottom: 10px;
+    line-height: 1.25;
+    background-color: #1f2532;
+    color: #fff;
+    border-color: #435372;
+}
+.mapboxgl-popup-close-button {
+    color: #fff;
+}
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
+    border-top-color: #1f2532;
+}
+.mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
+    border-bottom-color: #1f2532;
+}
+.mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
+    border-left-color: #1f2532;
+}
+.mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
+    border-right-color: #1f2532;
+}
